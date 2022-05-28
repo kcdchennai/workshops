@@ -1,0 +1,4 @@
+# Refer https://github.com/loft-sh/vcluster/blob/main/charts/k3s/values.yaml for full set of customisable options
+
+storage:
+  persistence: false

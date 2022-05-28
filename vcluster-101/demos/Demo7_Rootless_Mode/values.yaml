@@ -1,0 +1,6 @@
+# Refer https://github.com/loft-sh/vcluster/blob/main/charts/k3s/values.yaml for full set of customisable options
+
+# Run as a non-root user, guaranteed to work only for k3s
+securityContext:
+  runAsUser: 12345
+  runAsNonRoot: true

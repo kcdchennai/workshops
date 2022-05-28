@@ -1,0 +1,11 @@
+# Refer https://github.com/loft-sh/vcluster/blob/main/charts/k3s/values.yaml for full set of customisable options
+ 
+syncer:
+ extraArgs:
+  # This is required to access vcluster using nodeport
+  # It can be a comma separated list of master/worker node ips
+  - --tls-san=172.18.0.3
+
+# Service configurations
+service:
+  type: NodePort
