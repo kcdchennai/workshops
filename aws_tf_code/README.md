@@ -9,9 +9,11 @@
 - Extract and Add `terraform` executable path to ENV variables
 
 ## Terraform setup in Linux based systems
+- Refer official [terraform docs](https://www.terraform.io/downloads) for OS specific installation
+- Otherwise download the binary and extract it to /usr/local/bin (on Ubuntu system)
 ```
-wget https://releases.hashicorp.com/terraform/0.12.24/terraform_0.12.24_linux_amd64.zip
-unzip terraform_0.12.24_linux_amd64.zip -d terraform /usr/local/bin/
+wget https://releases.hashicorp.com/terraform/1.2.1/terraform_1.2.1_linux_amd64.zip
+unzip terraform_1.2.1_linux_amd64.zip -d terraform /usr/local/bin/
 ```
 If terraform executable stored in another path, make sure the path is added in `$PATH` variable permanently.
 
@@ -41,16 +43,20 @@ terraform {
       version = "~> 3.0"
     }
   }
+
+  required_version = "~> 1.0"
 }
 ```
 - We have already installed and configured `aws cli` authentication details pointing to the destination AWS account on which the infrastructure will be created
 - The configured credentials stored in the file `~/.aws.credentials`
-- We need to provide the reference for the above path in `shared_credentials_file` value using the `creds` variable
+- In older Terraform implementation, We need to provide the reference for the above path in `shared_credentials_file` value using the `creds` variable
+- But in latest Terraform implementation, the AWS credentials are read automatically by Terraform provider and we don't have to mention the path of `~/.aws.credentials`
+- Refer the Terraform docs regarding [AWS authentication and config](https://registry.terraform.io/providers/hashicorp/aws/latest/docs#authentication-and-configuration)
 ```
 # Configure the AWS Provider
 provider "aws" {
   region = var.region
-  shared_credentials_file = var.creds
+  shared_credentials_file = var.creds # Optional
   profile = "default"
 }
 ```
@@ -145,7 +151,7 @@ resource "aws_instance" "web" {
 }
 ```
 - `variables.tf` file should have the customised variables, a user wanted to provide before running the infra creation
-- User can also define default value for each variable in the file
+- User can also define default value for each variable in the file, just in case, it will be used as default value, if no `tfvars` file is passed as input arg.
  
 ```
 variable "region" {
@@ -224,9 +230,74 @@ terraform init
 terraform plan -var-file=aws.tfvars
 terraform apply -var-file=aws.tfvars -auto-approve
 ```
-- Once the `terrform apply` completed successfully it will show the `public ipaddress` of the apache server as `output`
-
+- `terraform init` - Initializes the terraform directory and download neccessary provider files and creates a `.terraform.lock.hcl` file
 ```
+$ terraform init
+
+Initializing the backend...
+
+Initializing provider plugins...
+- Finding hashicorp/aws versions matching "~> 3.0"...
+- Installing hashicorp/aws v3.75.2...
+- Installed hashicorp/aws v3.75.2 (signed by HashiCorp)
+
+Terraform has created a lock file .terraform.lock.hcl to record the provider
+selections it made above. Include this file in your version control repository
+so that Terraform can guarantee to make the same selections by default when
+you run "terraform init" in the future.
+
+Terraform has been successfully initialized!
+
+You may now begin working with Terraform. Try running "terraform plan" to see
+any changes that are required for your infrastructure. All Terraform commands
+should now work.
+
+If you ever set or change modules or backend configuration for Terraform,
+rerun this command to reinitialize your working directory. If you forget, other
+commands will detect it and remind you to do so if necessary.
+```
+- `terraform plan` shows the indicative resources list, and argument values and checks the authentication with AWS
+- Also it shows the details of resource changes, additions and destructions
+```
+$ terraform plan
+
+Terraform used the selected providers to generate the following execution plan. Resource actions are indicated with the following symbols:
+  + create
+
+Terraform will perform the following actions:
+
+  # aws_instance.web will be created
+  + resource "aws_instance" "web" {
+      + ami                                  = "ami-005e54dee72cc1d00"
+      + arn                                  = (known after apply)
+      + associate_public_ip_address          = (known after apply)
+      + availability_zone                    = (known after apply)
+      + cpu_core_count                       = (known after apply)
+.
+.
+.
+.
+
+Plan: 7 to add, 0 to change, 0 to destroy.
+
+Changes to Outputs:
+  + web_instance_ip = (known after apply)
+```
+- `terraform apply` command actually deployes the resources to the corresponding provider
+- Once the `terrform apply` completed successfully it will show the `public ipaddress` of the apache server as `output`
+- It asks for confirmation `yes` to proceed. It can be skipped using the option `-auto-approve` but it needs to be used with caution in real-time environments
+```
+Do you want to perform these actions?
+  Terraform will perform the actions described above.
+  Only 'yes' will be accepted to approve.
+
+  Enter a value: yes
+
+aws_vpc.app_vpc: Creating...
+.
+.
+.
+
 aws_instance.web: Creation complete after 33s [id=i-07f19000878a6ec11]
 
 Apply complete! Resources: 7 added, 0 changed, 0 destroyed.
@@ -243,6 +314,7 @@ web_instance_ip = "34.220.248.140"
 
 ## Cleanup 
 - As part of learning we will also cleanup the server using the command,
+- Similar to `apply` command, `destroy` command also asks for confirmation `yes` to proceed. It can be skipped using the option `-auto-approve` but it needs to be used with caution in real-time environments
 ```
 terraform destroy -var-file=aws.tfvars -auto-approve
 ```
