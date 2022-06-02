@@ -4,6 +4,7 @@ resource "aws_vpc" "app_vpc" {
 
   tags = {
     Name = "app-vpc"
+    Session = "KCD-Chennai"
   }
 }
 
@@ -23,6 +24,7 @@ resource "aws_subnet" "public_subnet" {
 
   tags = {
     Name = "public-subnet"
+    Session = "KCD-Chennai"
   }
 }
 
@@ -61,6 +63,7 @@ resource "aws_instance" "web" {
 
   tags = {
     Name = "web_instance"
+    Session = "KCD-Chennai"
   }
 
   volume_tags = {

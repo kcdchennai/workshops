@@ -12,5 +12,6 @@ resource "aws_instance" "sample_ec2" {
 
   tags = {
     Name = "Example-Ec2-Instance"
+    Session = "KCD-Chennai"
   }
 }
