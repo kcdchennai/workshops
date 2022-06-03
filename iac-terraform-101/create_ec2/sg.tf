@@ -21,5 +21,6 @@ resource "aws_security_group" "sample_sg" {
 
   tags = {
     Name = "allow_ssh"
+    Session = "KCD-Chennai"
   }
 }
