@@ -28,3 +28,5 @@ Terraform Best Practices
 Conclusion
 
 Q and A
+
+Slide deck for the session available [here](https://docs.google.com/presentation/d/1vfJP2r0RKTfrnZgbtNkSI2ZqZgN1N2pc/edit?usp=sharing&ouid=103102640691937702263&rtpof=true&sd=true)

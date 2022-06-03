@@ -1,7 +1,7 @@
 resource "random_string" "random_val" {
   length           = 5
-  #special          = true
-  #override_special = ".-"
+  special          = true
+  override_special = ".-"
   upper            = false
 }
 
